@@ -1,0 +1,280 @@
+# KenmoMinecraftClub SurvivaRoyal support script
+
+options:
+  HEADER: <gray>[<lime>SurvivaRoyal<gray>]<reset>
+  WORLD: world
+
+variables:
+  {running} = 0
+  {progress} = 0
+  {nextstar} = 0
+
+
+#
+# サバイバロイヤルコマンド
+
+command /sr <text>:
+  description: SurvivaRoyal control command
+  permission: survivaroyal.control
+  aliases: /surv
+  usage: /sr <command> 
+  trigger:
+    set {_cmd} to "%arg 1%"
+
+    if {_cmd} is "reload":
+      execute console command "/skript reload survivaroyal.sk"
+
+    else if {_cmd} is "start":
+      if {running} is 1:
+        execute command "/sr info"
+      else:
+        set {running} to 1
+        set {progress} to 0
+        set {nextstar} to 0
+        set time of {@WORLD} to 6:00
+        broadcast "{@HEADER} <light red>*** <yellow>サバイバロイヤルを開始します <light red>***<reset>"
+
+    else if {_cmd} is "stop":
+      if {running} is 1:
+        set {running} to 0
+        broadcast "{@HEADER} <light red>*** <yellow>サバイバロイヤルを終了します <light red>***<reset>"
+        execute command "/sr score"
+      else:
+        message "{@HEADER} サバイバロイヤルは開催されていません"
+
+    else if {_cmd} is "info":
+      if {running} is 1:
+        broadcast "{@HEADER} サバイバロイヤルは<gold>進行中<reset>です <gray>(<light gray>%{progress}%分経過<gray>)"
+        execute command "/sr score"
+      else:
+        message "{@HEADER} サバイバロイヤルは開催されていません"
+
+    else if {_cmd} is "score":
+      set {_red_members} to 0
+      set {_red_point} to 0
+      set {_green_members} to 0
+      set {_green_point} to 0
+      set {_blue_members} to 0
+      set {_blue_point} to 0
+
+      loop all players:
+        if {team.%loop-player%} is "red":
+          add amount of nether star in the loop-player's inventory to {_red_point}
+          add 1 to {_red_members}
+
+        if {team.%loop-player%} is "green":
+          add amount of nether star in the loop-player's inventory to {_green_point}
+          add 1 to {_green_members}
+
+        if {team.%loop-player%} is "blue":
+          add amount of nether star in the loop-player's inventory to {_blue_point}
+          add 1 to {_blue_members}
+
+      broadcast "{@HEADER} <yellow>生存者数<reset> ... <light red>赤<gray>[<white>%{_red_members}%<gray>] <light blue>青<gray>[<white>%{_blue_members}%<gray>] <light green>緑<gray>[<white>%{_green_members}%<gray>]"
+      broadcast "{@HEADER} <light cyan>ポイント<reset> ... <light red>赤<gray>[<white>%{_red_point}%<gray>] <light blue>青<gray>[<white>%{_blue_point}%<gray>] <light green>緑<gray>[<white>%{_green_point}%<gray>]"
+    
+    else if {_cmd} is "give":
+      if {running} is 1:
+        loop all players:
+          add loop-player to {_%{team.%loop-player%}%::*}
+
+        set {_red random} to a random player out of {_red::*}
+        if {_red random} is set:
+          broadcast "{@HEADER} <light red>%{_red random}%<reset>が<light cyan>ネザースター<reset>を手に入れた"
+          give a nether star to {_red random}
+
+        set {_green random} to a random player out of {_green::*}
+        if {_green random} is set:
+          broadcast "{@HEADER} <light green>%{_green random}%<reset>が<light cyan>ネザースター<reset>を手に入れた"
+          give a nether star to {_green random}
+
+        set {_blue random} to a random player out of {_blue::*}
+        if {_blue random} is set:
+          broadcast "{@HEADER} <light blue>%{_blue random}%<reset>が<light cyan>ネザースター<reset>を手に入れた"
+          give a nether star to {_blue random}
+
+      else:
+        message "{@HEADER} サバイバロイヤルは開催されていません"
+
+    else:
+      message "{@HEADER} /sr [reload|start|stop|info|score|give]"
+
+#
+# チームに参加する
+
+command /srjoin <colour> [<player>]:
+  description: Join to SurvivaRoyal team
+  usage: /srjoin <team> [<player>]
+  permission: survivaroyal.control
+  trigger:
+    set {_team} to "%arg 1%"
+    
+    if arg 2 is not set:
+      set {_player} to player
+    else:
+      set {_player} to "%arg 2%"
+
+    if {_team} is "red" or "green" or "blue":
+      set {team.%{_player}%} to {_team} 
+      execute command "/ct add %{team.%{_player}%}% %{_player}%"
+
+    if {_team} is "red":
+      broadcast "{@HEADER} %{_player}%が<light red>赤チーム<reset>に参加しました"
+    else if {_team} is "green":
+      broadcast "{@HEADER} %{_player}%が<light green>緑チーム<reset>に参加しました"
+    else if {_team} is "blue":
+      broadcast "{@HEADER} %{_player}%が<light blue>青チーム<reset>に参加しました"
+    else:
+      message "{@HEADER} <light red>チーム指定が不正です<reset>"
+
+#
+# チームから離れる
+
+command /srleave [<player>]:
+  description: Leave from SurvivaRoyal team
+  usage: /srleave [<player>]
+  permission: survivaroyal.control
+  trigger:
+    if arg 1 is not set:
+      set {_player} to player
+    else:
+      set {_player} to "%arg 1%"
+  
+    if {team.%{_player}%} is not set:
+      stop
+
+    execute command "/w %{_player}% チームから離脱しました。おつかれさまでした"
+    execute command "/ct leave %{_player}%"
+    delete {team.%{_player}%}
+
+#
+# 対チームメッセージ送信
+
+command /teammsg <colour> <text>:
+  description: Send message to team
+  usage: /teammsg <team> <message>
+  permission: survivaroyal.control
+  aliases: /tmsg, /tm
+  trigger:
+    set {_team} to "%arg 1%"
+
+    loop all players:
+      if {team.%loop-player%} is "%{_team}%":
+        message "<gray>[<gold>To %{_team}% team<gray>]<reset> %arg 2%" to loop-player
+    message "<gray>[<gold>To %{_team}% team<gray>]<reset> %arg 2%" to console
+
+#
+# 経過時間のカウント
+
+every 1 minutes:
+  if {running} is 1:
+    add 1 to {progress}
+
+    # 開始から10分おきに経過時間を表示する
+    set {_p} to {progress}
+    while {_p} >= 10:
+      add -10 to {_p}
+    if {_p} is 0:
+      broadcast "{@HEADER} 開始から<gold>%{progress}%分<reset>が経過しました"
+
+    # 10分程度経過したらスターを配布
+    add 1 to {nextstar}
+
+    if {nextstar} >= 10:
+      set {nextstar} to random integer between 0 and 5
+      broadcast "{@HEADER} <gold>空から<light cyan>星<gold>が降り注いだ… "
+      execute command "/sr give"
+
+
+#
+# 定期的にスコアを表示する
+
+every 5 minutes:
+  if {running} is 1:
+    execute command "/sr score"
+
+
+#
+# ゲーム参加者がリログすると名前の色が消えるのでログイン時に前のチームに入り直す
+
+on join:
+  if {running} is 1:
+    if {team.%player%} is set:
+      execute command "/ct add %{team.%player%}% %player%"
+
+#
+# ベッドの範囲指定、設置チームの記録
+
+on place of a bed:
+  world is {@WORLD}:
+    block's y-coordinate is smaller than 50:
+      message "{@HEADER} <light red>y50より下でのベッドの設置はできません<reset>"
+      cancel event
+    block's y-coordinate is larger than 100:
+      message "{@HEADER} <light red>y100より上でのベッドの設置はできません<reset>"
+      cancel event
+
+    # 各チームのメンバーが置いたベッドの座標を覚えておく
+    set {bed.%{team.%player%}%} to block's location
+
+
+#
+# ベッドの破壊判定
+
+on break of a bed:
+  set {_player} to player
+  set {_team} to {team.%player%}
+
+  world is {@WORLD}:
+    message "%block's location%"
+    message "%{bed.red}%"
+    message "%{bed.green}%"
+    message "%{bed.blue}%"
+    distance between block's location and {bed.red} is smaller than 2:
+      {_team} is not "red":
+        delete {bed.red} 
+        execute command "/tm %{_team}% %{_player}%が<light red>赤チーム<reset>のベッドを破壊した！"
+    distance between block's location and {bed.green} is smaller than 2:
+      {_team} is not "green":
+        delete {bed.green} 
+        execute command "/tm %{_team}% %{_player}%が<light green>緑チーム<reset>のベッドを破壊した！"
+    distance between block's location and {bed.blue} is smaller than 2:
+      {_team} is not "blue":
+        delete {bed.blue} 
+        execute command "/tm %{_team}% %{_player}%が<light blue>青チーム<reset>のベッドを破壊した！"
+
+#
+# Bedクラフト禁止
+
+on craft of a bed:
+  world is {@WORLD}:
+    message "{@HEADER} <light red>ベッドのクラフトは禁止されています<reset>"
+    cancel event
+
+
+#
+# Hopperクラフト禁止
+
+on craft of a hopper:
+  world is {@WORLD}:
+    message "{@HEADER} <light red>ホッパーのクラフトは禁止されています<reset>"
+    cancel event
+
+on place of a hopper:
+  world is {@WORLD}:
+    message "{@HEADER} <light red>ホッパーの設置は禁止されています<reset>"
+    cancel event
+
+#
+# Item frameクラフト禁止
+
+on craft of a item frame:
+  world is {@WORLD}:
+    message "{@HEADER} <light red>アイテムフレームのクラフトは禁止されています<reset>"
+    cancel event
+
+on place of a item frame:
+  world is {@WORLD}:
+    message "{@HEADER} <light red>アイテムフレームの設置は禁止されています<reset>"
+    cancel event
+
