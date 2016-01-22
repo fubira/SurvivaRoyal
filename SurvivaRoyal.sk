@@ -22,7 +22,7 @@ command /sr <text>:
     set {_cmd} to "%arg 1%"
 
     if {_cmd} is "reload":
-      execute console command "/skript reload survivaroyal.sk"
+      execute console command "/skript reload SurvivaRoyal.sk"
 
     else if {_cmd} is "start":
       if {running} is 1:
@@ -206,7 +206,7 @@ on join:
 # ベッドの範囲指定、設置チームの記録
 
 on place of a bed:
-  world is {@WORLD}:
+  world is "{@WORLD}":
     block's y-coordinate is smaller than 50:
       message "{@HEADER} <light red>y50より下でのベッドの設置はできません<reset>"
       cancel event
@@ -225,11 +225,7 @@ on break of a bed:
   set {_player} to player
   set {_team} to {team.%player%}
 
-  world is {@WORLD}:
-    message "%block's location%"
-    message "%{bed.red}%"
-    message "%{bed.green}%"
-    message "%{bed.blue}%"
+  world is "{@WORLD}":
     distance between block's location and {bed.red} is smaller than 2:
       {_team} is not "red":
         delete {bed.red} 
@@ -247,7 +243,7 @@ on break of a bed:
 # Bedクラフト禁止
 
 on craft of a bed:
-  world is {@WORLD}:
+  world is "{@WORLD}":
     message "{@HEADER} <light red>ベッドのクラフトは禁止されています<reset>"
     cancel event
 
@@ -256,12 +252,12 @@ on craft of a bed:
 # Hopperクラフト禁止
 
 on craft of a hopper:
-  world is {@WORLD}:
+  world is "{@WORLD}":
     message "{@HEADER} <light red>ホッパーのクラフトは禁止されています<reset>"
     cancel event
 
 on place of a hopper:
-  world is {@WORLD}:
+  world is "{@WORLD}":
     message "{@HEADER} <light red>ホッパーの設置は禁止されています<reset>"
     cancel event
 
@@ -269,12 +265,12 @@ on place of a hopper:
 # Item frameクラフト禁止
 
 on craft of a item frame:
-  world is {@WORLD}:
+  world is "{@WORLD}":
     message "{@HEADER} <light red>アイテムフレームのクラフトは禁止されています<reset>"
     cancel event
 
 on place of a item frame:
-  world is {@WORLD}:
+  world is "{@WORLD}":
     message "{@HEADER} <light red>アイテムフレームの設置は禁止されています<reset>"
     cancel event
 
