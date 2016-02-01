@@ -80,18 +80,18 @@ command /sr <text>:
 
         set {_red random} to a random player out of {_red::*}
         if {_red random} is set:
-          broadcast "{@HEADER} <light red>%{_red random}%<reset>が<light cyan>ネザースター<reset>を手に入れた"
-          give a nether star to {_red random}
+          broadcast "{@HEADER} <light red>%{_red random}%<reset>の足元に<light cyan>ネザースター<reset>が落ちてきた"
+          drop a nether star at {_red random}
 
         set {_green random} to a random player out of {_green::*}
         if {_green random} is set:
-          broadcast "{@HEADER} <light green>%{_green random}%<reset>が<light cyan>ネザースター<reset>を手に入れた"
-          give a nether star to {_green random}
+          broadcast "{@HEADER} <light green>%{_green random}%<reset>の足元に<light cyan>ネザースター<reset>が落ちてきた"
+          drop a nether star at {_green random}
 
         set {_blue random} to a random player out of {_blue::*}
         if {_blue random} is set:
-          broadcast "{@HEADER} <light blue>%{_blue random}%<reset>が<light cyan>ネザースター<reset>を手に入れた"
-          give a nether star to {_blue random}
+          broadcast "{@HEADER} <light blue>%{_blue random}%<reset>の足元に<light cyan>ネザースター<reset>が落ちてきた"
+          drop a nether star at {_blue random}
 
       else:
         message "{@HEADER} サバイバロイヤルは開催されていません"
