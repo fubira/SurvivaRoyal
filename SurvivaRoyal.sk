@@ -1,7 +1,7 @@
 # KenmoMinecraftClub SurvivaRoyal support script
 
 options:
-  HEADER: <gray>[<lime>SurvivaRoyal<gray>]<reset>
+  HEADER: <gray>[<dark green>SurvivaRoyal<gray>]<reset>
   WORLD: world
 
 variables:
@@ -17,7 +17,7 @@ command /sr <text>:
   description: SurvivaRoyal control command
   permission: survivaroyal.control
   aliases: /surv
-  usage: /sr <command> 
+  usage: /sr <command>
   trigger:
     set {_cmd} to "%arg 1%"
 
@@ -72,7 +72,7 @@ command /sr <text>:
 
       broadcast "{@HEADER} <yellow>生存者数<reset> ... <light red>赤<gray>[<white>%{_red_members}%<gray>] <light blue>青<gray>[<white>%{_blue_members}%<gray>] <light green>緑<gray>[<white>%{_green_members}%<gray>]"
       broadcast "{@HEADER} <light cyan>ポイント<reset> ... <light red>赤<gray>[<white>%{_red_point}%<gray>] <light blue>青<gray>[<white>%{_blue_point}%<gray>] <light green>緑<gray>[<white>%{_green_point}%<gray>]"
-    
+
     else if {_cmd} is "give":
       if {running} is 1:
         loop all players:
@@ -108,14 +108,14 @@ command /srjoin <colour> [<player>]:
   permission: survivaroyal.control
   trigger:
     set {_team} to "%arg 1%"
-    
+
     if arg 2 is not set:
       set {_player} to player
     else:
       set {_player} to "%arg 2%"
 
     if {_team} is "red" or "green" or "blue":
-      set {team.%{_player}%} to {_team} 
+      set {team.%{_player}%} to {_team}
       execute command "/ct add %{team.%{_player}%}% %{_player}%"
 
     if {_team} is "red":
@@ -139,7 +139,7 @@ command /srleave [<player>]:
       set {_player} to player
     else:
       set {_player} to "%arg 1%"
-  
+
     if {team.%{_player}%} is not set:
       stop
 
@@ -177,11 +177,11 @@ every 1 minutes:
     if {_p} is 0:
       broadcast "{@HEADER} 開始から<gold>%{progress}%分<reset>が経過しました"
 
-    # 10分程度経過したらスターを配布
+    # 3～6分程度経過したらスターを配布
     add 1 to {nextstar}
 
-    if {nextstar} >= 10:
-      set {nextstar} to random integer between 0 and 5
+    if {nextstar} >= 6:
+      set {nextstar} to random integer between 0 and 3
       broadcast "{@HEADER} <gold>空から<light cyan>星<gold>が降り注いだ… "
       execute command "/sr give"
 
@@ -228,15 +228,15 @@ on break of a bed:
   world is "{@WORLD}":
     distance between block's location and {bed.red} is smaller than 2:
       {_team} is not "red":
-        delete {bed.red} 
+        delete {bed.red}
         execute command "/tm %{_team}% %{_player}%が<light red>赤チーム<reset>のベッドを破壊した！"
     distance between block's location and {bed.green} is smaller than 2:
       {_team} is not "green":
-        delete {bed.green} 
+        delete {bed.green}
         execute command "/tm %{_team}% %{_player}%が<light green>緑チーム<reset>のベッドを破壊した！"
     distance between block's location and {bed.blue} is smaller than 2:
       {_team} is not "blue":
-        delete {bed.blue} 
+        delete {bed.blue}
         execute command "/tm %{_team}% %{_player}%が<light blue>青チーム<reset>のベッドを破壊した！"
 
 #
@@ -273,4 +273,3 @@ on place of a item frame:
   world is "{@WORLD}":
     message "{@HEADER} <light red>アイテムフレームの設置は禁止されています<reset>"
     cancel event
-
