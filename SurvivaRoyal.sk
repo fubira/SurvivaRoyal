@@ -177,11 +177,11 @@ every 1 minutes:
     if {_p} is 0:
       broadcast "{@HEADER} 開始から<gold>%{progress}%分<reset>が経過しました"
 
-    # 3～6分程度経過したらスターを配布
+    # 5～10分程度経過したらスターを配布
     add 1 to {nextstar}
 
-    if {nextstar} >= 6:
-      set {nextstar} to random integer between 0 and 3
+    if {nextstar} >= 10:
+      set {nextstar} to random integer between 0 and 5
       broadcast "{@HEADER} <gold>空から<light cyan>星<gold>が降り注いだ… "
       execute command "/sr give"
 
