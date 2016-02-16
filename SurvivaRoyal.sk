@@ -247,6 +247,12 @@ on craft of a bed:
     message "{@HEADER} <light red>ベッドのクラフトは禁止されています<reset>"
     cancel event
 
+#
+# TNTの爆発威力を増大させる
+
+on explosion:
+  entity is tnt:
+    make an explosion with power 8 at entity
 
 #
 # Hopperクラフト禁止
