@@ -164,6 +164,21 @@ command /teammsg <colour> <text>:
     message "<gray>[<gold>To %{_team}% team<gray>]<reset> %arg 2%" to console
 
 #
+# 観客の発言をプレイヤーに伝えない
+
+on chat:
+  if {running} is 1:
+    if first 3 character of the message is not "<light green>>":
+      if {team.%player%} is not set:
+        loop all players:
+          if {team.%loop-player%} is not set:
+            message "<dark aqua>[SPEC]<reset> <%player%> %message%" to loop-player
+        message "<dark aqua>[SPEC]<reset> <%player%> %message%" to console
+        cancel event
+
+
+
+#
 # 経過時間のカウント
 
 every 1 minutes:
