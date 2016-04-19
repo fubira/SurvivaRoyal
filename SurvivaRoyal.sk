@@ -142,7 +142,7 @@ command /srjoin <colour> [<player>]:
 #
 # チームから離れる
 
-command /srleave [<player>]:
+command /srleave [<text>]:
   description: Leave from SurvivaRoyal team
   usage: /srleave [<player>]
   permission: survivaroyal.control
@@ -169,13 +169,29 @@ command /teammsg <colour> <text>:
   aliases: /tmsg, /tm
   trigger:
     set {_team} to "%arg 1%"
+    if player is set:
+      set {_sender} to player
+      set {_sender_team} to {team.%player%}
+      if {_sender_team} is set:
+        set {_sender_color} to {teamcolor.%{team.%player%}%}
+      else:
+        set {_sender_color} to "white"
+      set {_sender_tag} to "<<%{_sender_color}%>%{_sender}%<reset>>"
+    else:
+      set {_sender} to "CONSOLE"
+      delete {_sender_team}
+      set {_sender_color} to "white"
+      set {_sender_tag} to ""
+    
+
 
     loop all players:
       if {team.%loop-player%} is "%{_team}%":
-        message "%{tmsghead.%{_team}%}% <<%{teamcolor.%{team.%player%}%}%>%player%<reset>> %arg 2%" to loop-player
-    if {_team} is not "%{team.%player%}%":
-      message "%{tmsghead.%{_team}%}% <<%{teamcolor.%{team.%player%}%}%>%player%<reset>> %arg 2%" to player
-    message "%{tmsghead.%{_team}%}% <<%{teamcolor.%{team.%player%}%}%>%player%<reset>> %arg 2%" to console 
+        message "%{tmsghead.%{_team}%}% %{_sender_tag}% %arg 2%" to loop-player
+    if {_sender} is player:
+      if {_team} is not "%{_sender_team}%":
+        message "%{tmsghead.%{_team}%}% %{_sender_tag}% %arg 2%" to player
+    message "%{tmsghead.%{_team}%}% %{_sender_tag}% %arg 2%" to console 
 
 #
 # チームチャット
@@ -279,20 +295,6 @@ on place of a bed:
     # 各チームのメンバーが置いたベッドの座標を覚えておく
     set {bed.%{team.%player%}%} to block's location
 
-  world is "{@WORLD}":
-    distance between block's location and {bed.red} is smaller than 2:
-      delete {bed.red}
-      {_team} is not "red":
-        execute command "/tm %{_team}% <%{_team}%>%{_player}%<reset>が<light red>赤チーム<reset>のベッドを破壊した！"
-    distance between block's location and {bed.green} is smaller than 2:
-      delete {bed.green}
-      {_team} is not "green":
-        execute command "/tm %{_team}% <%{_team}%>%{_player}%<reset>が<light green>緑チーム<reset>のベッドを破壊した！"
-    distance between block's location and {bed.blue} is smaller than 2:
-      delete {bed.blue}
-      {_team} is not "blue":
-        execute command "/tm %{_team}% <%{_team}%>%{_player}%<reset>が<light blue>青チーム<reset>のベッドを破壊した！"
-
 
 #
 # Bedを拾ったことを周知する
@@ -315,17 +317,27 @@ on break of a bed:
 
   world is "{@WORLD}":
     distance between block's location and {bed.red} is smaller than 2:
+      delete {bed.red}
       {_team} is not "red":
-        delete {bed.red}
         execute command "/tm %{_team}% %{_player}%が<light red>赤チーム<reset>のベッドを破壊した！"
     distance between block's location and {bed.green} is smaller than 2:
+      delete {bed.green}
       {_team} is not "green":
-        delete {bed.green}
         execute command "/tm %{_team}% %{_player}%が<light green>緑チーム<reset>のベッドを破壊した！"
     distance between block's location and {bed.blue} is smaller than 2:
+      delete {bed.blue}
       {_team} is not "blue":
-        delete {bed.blue}
         execute command "/tm %{_team}% %{_player}%が<light blue>青チーム<reset>のベッドを破壊した！"
+
+#
+# リスポーン時にベッドがなければチームから抜ける
+
+on respawn:
+  wait 1 tick
+  if {team.%player%} is set:
+    if {bed.%{team.%player%}%} is not set:
+      execute command "/srleave %player%"
+
 
 #
 # Bedクラフト禁止
