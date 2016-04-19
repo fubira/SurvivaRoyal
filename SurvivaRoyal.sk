@@ -10,15 +10,16 @@ variables:
   {progress} = 0
   {nextstar} = 0
 
-  teamcolor.red = "light red"
-  teamcolor.green = "light green"
-  teamcolor.blue = "light blue"
-  tmsghead.red = "<gray>[<gold>TO TEAM <light red>RED<gray>]<reset>"
-  tmsghead.green = "<gray>[<gold>TO TEAM <light green>GREEN<gray>]<reset>"
-  tmsghead.blue = "<gray>[<gold>TO TEAM <light blue>BLUE<gray>]<reset>"
-  tchathead.red = "<gray>[<gold>TEAM <light red>RED<gray>]<reset>"
-  tchathead.green = "<gray>[<gold>TEAM <light green>GREEN<gray>]<reset>"
-  tchathead.blue = "<gray>[<gold>TEAM <light blue>BLUE<gray>]<reset>"
+on script load:
+  set {teamcolor.red} to "light red"
+  set {teamcolor.green} to "light green"
+  set {teamcolor.blue} to "light blue"
+  set {tmsghead.red} to "<gray>[<yellow>-> TO TEAM <light red>RED<gray>]<reset>"
+  set {tmsghead.green} to "<gray>[<yellow>-> TO TEAM <light green>GREEN<gray>]<reset>"
+  set {tmsghead.blue} to "<gray>[<yellow>-> TO TEAM <light blue>BLUE<gray>]<reset>"
+  set {tchathead.red} to "<gray>[<gold>TEAM <light red>RED<gray>]<reset>"
+  set {tchathead.green} to "<gray>[<gold>TEAM <light green>GREEN<gray>]<reset>"
+  set {tchathead.blue} to "<gray>[<gold>TEAM <light blue>BLUE<gray>]<reset>"
 
 
 #
