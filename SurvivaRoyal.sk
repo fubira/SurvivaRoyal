@@ -160,8 +160,15 @@ command /teammsg <colour> <text>:
 
     loop all players:
       if {team.%loop-player%} is "%{_team}%":
-        message "<gray>[<gold>To %{_team}% team<gray>]<reset> %arg 2%" to loop-player
-    message "<gray>[<gold>To %{_team}% team<gray>]<reset> %arg 2%" to console
+        if {_team} is "red":
+          message "<gray>[<gold>TEAM<reset> <light red>RED<gray>]<reset> %arg 2%" to loop-player
+        else if {_team} is "green":
+          message "<gray>[<gold>TEAM<reset> <light green>GREEN<gray>]<reset> %arg 2%" to loop-player
+        else if {_team} is "blue":
+          message "<gray>[<gold>TEAM<reset> <light blue>BLUE<gray>]<reset> %arg 2%" to loop-player
+
+    # consoleにも表示しておく
+    message "<gray>[<gold>To %{_team}% ONLY<gray>]<reset> %arg 2%" to console
 
 #
 # 観客の発言をプレイヤーに伝えない
@@ -229,8 +236,39 @@ on place of a bed:
       message "{@HEADER} <light red>y100より上でのベッドの設置はできません<reset>"
       cancel event
 
+    # 自チームのベッドが既に存在している場合、ベッドを置くことは出来ない
+    if {bed.%{team.%player%}%} is set:
+      message "{@HEADER} <yellow>チームベッドは既に設置済みです。複数のベッドを置くことは出来ません<reset>"
+      cancel event
+
     # 各チームのメンバーが置いたベッドの座標を覚えておく
     set {bed.%{team.%player%}%} to block's location
+
+  world is "{@WORLD}":
+    distance between block's location and {bed.red} is smaller than 2:
+      delete {bed.red}
+      {_team} is not "red":
+        execute command "/tm %{_team}% <%{_team}%>%{_player}%<reset>が<light red>赤チーム<reset>のベッドを破壊した！"
+    distance between block's location and {bed.green} is smaller than 2:
+      delete {bed.green}
+       {_team} is not "green":
+        execute command "/tm %{_team}% <%{_team}%>%{_player}%<reset>が<light green>緑チーム<reset>のベッドを破壊した！"
+    distance between block's location and {bed.blue} is smaller than 2:
+      delete {bed.blue}
+      {_team} is not "blue":
+        execute command "/tm %{_team}% <%{_team}%>%{_player}%<reset>が<light blue>青チーム<reset>のベッドを破壊した！"
+
+
+#
+# Bedを拾ったことを周知する
+
+on pick up of a bed:
+  set {_player} to player
+  set {_team} to {team.%player%}
+
+  world is "{@WORLD}":
+    message "{@HEADER} <yellow>ベッドを拾いました！<reset>"
+    execute command "/tm %{_team}% <yellow>%{_player}%がベッドを拾いました！<reset>"
 
 
 #
