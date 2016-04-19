@@ -6,8 +6,19 @@ options:
 
 variables:
   {running} = 0
+  {teamchat} = 0
   {progress} = 0
   {nextstar} = 0
+
+  teamcolor.red = "light red"
+  teamcolor.green = "light green"
+  teamcolor.blue = "light blue"
+  tmsghead.red = "<gray>[<gold>TO TEAM <light red>RED<gray>]<reset>"
+  tmsghead.green = "<gray>[<gold>TO TEAM <light green>GREEN<gray>]<reset>"
+  tmsghead.blue = "<gray>[<gold>TO TEAM <light blue>BLUE<gray>]<reset>"
+  tchathead.red = "<gray>[<gold>TEAM <light red>RED<gray>]<reset>"
+  tchathead.green = "<gray>[<gold>TEAM <light green>GREEN<gray>]<reset>"
+  tchathead.blue = "<gray>[<gold>TEAM <light blue>BLUE<gray>]<reset>"
 
 
 #
@@ -97,7 +108,7 @@ command /sr <text>:
         message "{@HEADER} サバイバロイヤルは開催されていません"
 
     else:
-      message "{@HEADER} /sr [reload|start|stop|info|score|give]"
+      message "{@HEADER} /sr [reload|start|stop|info|score|give|tcon|tcoff]"
 
 #
 # チームに参加する
@@ -160,29 +171,52 @@ command /teammsg <colour> <text>:
 
     loop all players:
       if {team.%loop-player%} is "%{_team}%":
-        if {_team} is "red":
-          message "<gray>[<gold>TEAM<reset> <light red>RED<gray>]<reset> %arg 2%" to loop-player
-        else if {_team} is "green":
-          message "<gray>[<gold>TEAM<reset> <light green>GREEN<gray>]<reset> %arg 2%" to loop-player
-        else if {_team} is "blue":
-          message "<gray>[<gold>TEAM<reset> <light blue>BLUE<gray>]<reset> %arg 2%" to loop-player
-
-    # consoleにも表示しておく
-    message "<gray>[<gold>To %{_team}% ONLY<gray>]<reset> %arg 2%" to console
+        message "%{tmsghead.%{_team}%}% <<%{teamcolor.%{team.%player%}%}%>%player%<reset>> %arg 2%" to loop-player
+    if {_team} is not "%{team.%player%}%":
+      message "%{tmsghead.%{_team}%}% <<%{teamcolor.%{team.%player%}%}%>%player%<reset>> %arg 2%" to player
+    message "%{tmsghead.%{_team}%}% <<%{teamcolor.%{team.%player%}%}%>%player%<reset>> %arg 2%" to console 
 
 #
-# 観客の発言をプレイヤーに伝えない
+# チームチャット
+
+command /tchat [<boolean>]:
+  description: Teamchat activate / deactivate
+  usage: /tchat [on | off]
+  permission: survivaroyal.control
+  aliases: /tc
+  trigger:
+    set {_arg} to "%arg 1%"
+    if {_arg} is "true":
+      set {teamchat} to 1
+      message "<gray>チームチャットを有効にしました<reset>"
+    else if {_arg} is "false":
+      set {teamchat} to 0
+      message "<gray>チームチャットを無効にしました<reset>"
+    else:
+      if {teamchat} is 0:
+        message "<gray>チームチャットは無効です<reset>"
+      else:
+        message "<gray>チームチャットは有効です<reset>"
+
 
 on chat:
-  if {running} is 1:
+  if {teamchat} is 1:
     if first 3 character of the message is not "<light green>>":
       if {team.%player%} is not set:
+        # 観客チャット
         loop all players:
           if {team.%loop-player%} is not set:
             message "<dark aqua>[SPEC]<reset> <%player%> %message%" to loop-player
         message "<dark aqua>[SPEC]<reset> <%player%> %message%" to console
         cancel event
 
+      if {team.%player%} is set:
+        # チームチャット
+        loop all players:
+          if {team.%loop-player%} is "%{team.%player%}%":
+            message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to loop-player
+        message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to console
+        cancel event
 
 
 #
@@ -251,7 +285,7 @@ on place of a bed:
         execute command "/tm %{_team}% <%{_team}%>%{_player}%<reset>が<light red>赤チーム<reset>のベッドを破壊した！"
     distance between block's location and {bed.green} is smaller than 2:
       delete {bed.green}
-       {_team} is not "green":
+      {_team} is not "green":
         execute command "/tm %{_team}% <%{_team}%>%{_player}%<reset>が<light green>緑チーム<reset>のベッドを破壊した！"
     distance between block's location and {bed.blue} is smaller than 2:
       delete {bed.blue}
