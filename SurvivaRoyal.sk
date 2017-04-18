@@ -271,33 +271,34 @@ every 5 minutes:
 #
 # 各プレイヤーのコンパスのターゲットを最も近いベッドに設定する
 
-every 5 seconds:
+every 5 seconds in "{@WORLD}":
   if {running} is 1:
     loop all players:
       set {_distance} to 99999
       delete {_target}
 
       if {bed.red} is set:
-        set {_d_red} to distance between the player and {bed.red}
-        if {_distance} larget than {_d_red}:
+        set {_d_red} to distance between the loop-player and {bed.red} 
+        if {_distance} is larger than {_d_red}:
           set {_distance} to {_d_red}
           set {_target} to {bed.red}
         
       if {bed.green} is set:
-        set {_d_green} to distance between the player and {bed.green}
-        if {_distance} larget than {_d_green}:
+        set {_d_green} to distance between the loop-player and {bed.green}
+        if {_distance} is larger than {_d_green}:
           set {_distance} to {_d_green}
           set {_target} to {bed.green}
         
       if {bed.blue} is set:
-        set {_d_blue} to distance between the player and {bed.blue}
-        if {_distance} larget than {_d_blue}:
+        set {_d_blue} to distance between the loop-player and {bed.blue}
+        if {_distance} is larger than {_d_blue}:
           set {_distance} to {_d_blue}
           set {_target} to {bed.blue}
 
       if {_target} is set:
-        set the loop-player's compsass target to {_target}
+        set the loop-player's compass target to {_target}
 
+      #message "%location of loop-player% %{_distance}% %{bed.red}% %{_target}%" to console 
 #
 # ゲーム参加者がリログすると名前の色が消えるのでログイン時に前のチームに入り直す
 
@@ -321,8 +322,8 @@ on place of a bed:
     # 自チームのベッドが既に存在している場合、警告
     if {bed.%{team.%player%}%} is set:
       if player has permission "survivaroyal.control":
-        message "{@HEADER} <yellow>チームベッドを上書きしました。古いベッドが残っている可能性があります。(%{bed.%{team.%
-player%}%}%)<reset>"
+        message "{@HEADER} <yellow>チームベッドを上書きしました。古いベッドが残っている可能性があります。%{bed.%{team.%player%}%}%<reset>"
+
       else:
         message "{@HEADER} <yellow>チームベッドは既に設置済みです。<reset>"
         cancel event
