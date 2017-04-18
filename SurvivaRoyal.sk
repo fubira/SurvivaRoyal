@@ -232,8 +232,12 @@ on chat:
         loop all players:
           if {team.%loop-player%} is "%{team.%player%}%":
             message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to loop-player
+          
+          # ワールド内にいる観客は全チームのチャットをみることが出来る
           if {team.%loop-player%} is not set:
-            message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to loop-player
+            if loop-player is in world:
+              message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to loop-player
+
         message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to console
         cancel event
 
@@ -279,19 +283,19 @@ every 5 seconds:
 
       if {bed.red} is set:
         set {_d_red} to distance between the player and {bed.red}
-        if {_distance} larget than {_d_red}:
+        if {_distance} larger than {_d_red}:
           set {_distance} to {_d_red}
           set {_target} to {bed.red}
         
       if {bed.green} is set:
         set {_d_green} to distance between the player and {bed.green}
-        if {_distance} larget than {_d_green}:
+        if {_distance} larger than {_d_green}:
           set {_distance} to {_d_green}
           set {_target} to {bed.green}
         
       if {bed.blue} is set:
         set {_d_blue} to distance between the player and {bed.blue}
-        if {_distance} larget than {_d_blue}:
+        if {_distance} larger than {_d_blue}:
           set {_distance} to {_d_blue}
           set {_target} to {bed.blue}
 
@@ -321,7 +325,7 @@ on place of a bed:
     # 自チームのベッドが既に存在している場合、警告
     if {bed.%{team.%player%}%} is set:
       if player has permission "survivaroyal.control":
-        message "{@HEADER} <yellow>チームベッドを上書きしました。古いベッドが残っている可能性があります。(%{bed.%{team.%
+        message "{@HEADER} <yellow>{team.%player%}チームのベッドを上書きしました。古いベッドが残っている可能性があります。(%{bed.%{team.%
 player%}%}%)<reset>"
       else:
         message "{@HEADER} <yellow>チームベッドは既に設置済みです。<reset>"
