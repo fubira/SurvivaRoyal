@@ -232,8 +232,12 @@ on chat:
         loop all players:
           if {team.%loop-player%} is "%{team.%player%}%":
             message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to loop-player
+          
+          # ワールド内にいる観客は全チームのチャットをみることが出来る
           if {team.%loop-player%} is not set:
-            message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to loop-player
+            if loop-player is in world:
+              message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to loop-player
+
         message "%{tchathead.%{team.%player%}%}% <%player%> %message%" to console
         cancel event
 
@@ -322,8 +326,7 @@ on place of a bed:
     # 自チームのベッドが既に存在している場合、警告
     if {bed.%{team.%player%}%} is set:
       if player has permission "survivaroyal.control":
-        message "{@HEADER} <yellow>チームベッドを上書きしました。古いベッドが残っている可能性があります。%{bed.%{team.%player%}%}%<reset>"
-
+        message "{@HEADER} <yellow>{team.%player%}チームのベッドを上書きしました。古いベッドが残っている可能性があります。%{bed.%{team.%player%}%}%<reset>"
       else:
         message "{@HEADER} <yellow>チームベッドは既に設置済みです。<reset>"
         cancel event
